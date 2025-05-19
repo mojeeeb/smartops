@@ -1,0 +1,58 @@
+# Bot configuration
+bot:
+  image: smartops-bot:latest
+  replicas: 1
+  n8nWebhookUrl: "http://host.docker.internal:5678/webhook/trivy-results"
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+
+# Trivy configuration
+trivy:
+  schedule: "0 */6 * * *"  # Run every 6 hours
+  image: aquasec/trivy:latest
+  targetImage: smartops-bot:latest
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "200m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+# Prometheus configuration
+prometheus:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "200m"
+    limits:
+      memory: "1Gi"
+      cpu: "500m"
+
+# Grafana configuration
+grafana:
+  enabled: true
+  adminPassword: "admin"
+  persistence:
+    enabled: true
+    size: 10Gi
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "512Mi"
+      cpu: "200m"
+
+# Storage configuration
+storage:
+  trivyResults:
+    size: 1Gi 

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smartops-bot
+  namespace: smartops
+  labels:
+    app: smartops-bot
+spec:
+  replicas: {{ .Values.bot.replicas }}
+  selector:
+    matchLabels:
+      app: smartops-bot
+  template:
+    metadata:
+      labels:
+        app: smartops-bot
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+    spec:
+      containers:
+      - name: bot
+        image: {{ .Values.bot.image }}
+        env:
+        - name: N8N_WEBHOOK_URL
+          value: {{ .Values.bot.n8nWebhookUrl | quote }}
+        volumeMounts:
+        - name: trivy-results
+          mountPath: /data
+        resources:
+          {{- toYaml .Values.bot.resources | nindent 10 }}
+      volumes:
+      - name: trivy-results
+        persistentVolumeClaim:
+          claimName: trivy-results-pvc 

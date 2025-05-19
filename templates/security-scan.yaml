@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: trivy-scan
+  namespace: smartops
+spec:
+  schedule: {{ .Values.trivy.schedule | quote }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: trivy
+            image: {{ .Values.trivy.image }}
+            command:
+            - trivy
+            - image
+            - --format
+            - json
+            - --output
+            - /data/trivy-results.json
+            - {{ .Values.trivy.targetImage }}
+            volumeMounts:
+            - name: trivy-results
+              mountPath: /data
+            resources:
+              {{- toYaml .Values.trivy.resources | nindent 14 }}
+          volumes:
+          - name: trivy-results
+            persistentVolumeClaim:
+              claimName: trivy-results-pvc
+          restartPolicy: OnFailure 
