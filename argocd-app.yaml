@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/mojeeeb/smartops.git
     targetRevision: HEAD
-    path: smartops
+    path: .
   destination:
     server: https://kubernetes.default.svc
     namespace: smartops
